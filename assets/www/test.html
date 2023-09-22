@@ -1,0 +1,74 @@
+//d
+var admobid = {};
+
+// todo: replace the following ad units with your own
+if( /(android)/i.test(navigator.useragent) ) {
+    admobid = { // for android
+      banner: 'ca-app-pub-8256871331195390/8077618694',
+      interstitial: 'ca-app-pub-8256871331195390/6189821955',
+      rewardvideo: 'ca-app-pub-8256871331195390/2890529754',
+    };
+} else if(/(ipod|iphone|ipad)/i.test(navigator.useragent)) {
+  admobid = { // for ios
+    banner: 'ca-app-pub-8256871331195390/8077618694',
+    interstitial: 'ca-app-pub-8256871331195390/6189821955',
+    rewardvideo: 'ca-app-pub-3940256099942544/1712485313',
+  };
+} else {
+admobid = { // for Windows Phone
+    banner: 'ca-app-pub-6869992474017983/8878394753',
+    interstitial: 'ca-app-pub-6869992474017983/1355127956',
+    rewardvideo: '',
+  };
+}
+    var videoReady = false;
+function prepare() {
+    videoReady = false;
+    AdMob.prepareRewardVideoAd({
+        adId: admobid.rewardvideo,
+        autoShow: false
+    });
+}
+function show() {
+    if(videoReady) {
+        document.getElementById("bonus").style.display = "block";
+    }
+}
+document.addEventListener('onAdLoaded', function(data){
+    if(data.adType == 'rewardvideo') videoReady = true;
+});
+document.addEventListener('onAdFailLoad', function(data){
+    if(data.adType == 'rewardvideo') {
+         videoReady = false;
+         prepare(); // prepare again for next ad
+    }
+});
+document.addEventListener('onAdDismiss', function(data){
+    if(data.adType == 'rewardvideo') prepare(); // prepare again for next ad
+});
+document.addEventListener('onAdPresent', function(data){
+    if(data.adType == 'rewardvideo') 
+    alert("reward Video played"); // prepare again for next ad 
+    document.getElementById("bonus").style.display = "none";
+});
+function initAd() {
+  if (! AdMob ) { alert( 'admob plugin not ready' ); return; }
+
+  // this will create a banner on startup
+  AdMob.createBanner( {
+    adId: admobid.banner,
+    position: AdMob.AD_POSITION.BOTTOM_CENTER,
+    overlap: false,
+    offsetTopBar: false,
+    istesting: false,
+    bgColor: 'black'
+  } );
+
+  // this will load a full screen ad on startup
+}
+
+if(( /(ipad|iphone|ipod|android|windows phone)/i.test(navigator.userAgent) )) {
+    document.addEventListener('deviceready', initApp, false);
+} else {
+    initAd();
+}

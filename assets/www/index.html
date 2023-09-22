@@ -1,0 +1,274 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<style>
+body{
+ height: 99vh;
+    background:  #67b26f; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient( #67b26f, #4ca2cd); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient( #67b26f, #4ca2cd); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient( #67b26f, #4ca2cd); /* For Firefox 3.6 to 15 */
+    background: linear-gradient( #67b26f, #4ca2cd); /* Standard syntax (must be last) */
+}
+.let{
+    margin: 1px;
+    left: 2px;
+    display: inline-block; 
+    height: 12vw;
+    width: 12vw;
+    line-height: 12vw;
+
+    -moz-border-radius: 50%; /* or 50% */
+    border-radius: 50%; /* or 50% */
+
+    background-color: black;
+    color: white;
+    text-align: center;
+    font-size: 2em;
+     border: 2px solid white;
+
+}
+#letterList{
+    text-align: center;
+    line-height: 50px;
+    display: block;
+    
+}
+#answerPosition{
+    text-align: center;
+    line-height: 50px;
+    display: block;
+}
+.ans{
+    margin: 1px;
+    left: 2px;
+    display: inline-block; 
+    height: 12vw;
+    width: 12vw;
+    line-height: 12vw;
+
+    -moz-border-radius: 50%; /* or 50% */
+    border-radius: 50%; /* or 50% */
+
+    background-color: black;
+    color: white;
+    text-align: center;
+    font-size: 2em;
+     border: 2px solid white;
+}
+#level{
+    font-family: verdana;
+    top: 10px;
+    color: white;
+    text-align: center;
+    font-size: 1.3em;
+}
+.share{
+    position: absolute;
+    margin: 1px;
+    top: 10px;
+    left: 2px;
+    height: 12vw;
+    width: 12vw;
+    line-height: 12vw;
+
+    -moz-border-radius: 50%; /* or 50% */
+    border-radius: 50%; /* or 50% */
+
+    text-align: center;
+    font-size: 2em;
+}
+#bonus{
+    visibility: hidden;
+    position: absolute;
+    margin: 1px;
+    top: 10px;
+    right: 2px;
+    height: 12vw;
+    width: 12vw;
+    line-height: 12vw;
+
+    -moz-border-radius: 50%; /* or 50% */
+    border-radius: 50%; /* or 50% */
+
+    background-color: red;
+    color: white;
+    text-align: center;
+    font-size: 10px;
+}
+
+</style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: content: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+    <script src="components/loader.js"></script>
+    <link rel="stylesheet" href="components/loader.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="levelNumber.js"></script>
+    <script type="text/javascript" src="admob_simple.js"></script>
+    
+    <script>
+        // PhoneGap event handler
+        document.addEventListener("deviceready", onDeviceReady, false);
+        function onDeviceReady() {
+
+        }
+    </script>
+    <script>
+        
+    </script>
+    <script src="getNewWord.js"></script> 
+</head>
+<body onload="getscore();">
+<script>
+// random word
+var answerLetters = new Array;
+var str;
+var arrStr;
+var allLength = 0;
+var selected;
+var n; 
+var positions = new Array;
+var letPositions = new Array;
+var answerString = new Array;
+var shuffled;
+var randLetters = new Array;
+$.getJSON("words.json", function(json) {
+    if(localStorage.n){
+    n= localStorage.n;
+    }
+    else{
+        n=Math.floor(Math.random() * (2 - 1 + 1)) + 1;
+    }
+    if(localStorage.shuffled){
+        var localstring = localStorage.shuffled;
+        var txt = localstring.replace(/"/i,"");
+    shuffled = txt.split(",");
+    }
+    else{
+        shuffled= json.sort(function(){return .5 - Math.random()});
+    }
+    localStorage.shuffled = shuffled;
+    //shuffled = json.sort(function(){return .5 - Math.random()});
+
+    function randomsort(a, b) { 
+        return Math.random()>.5 ? -1 : 1;
+    }
+    selected=shuffled.slice(0,n);
+    for(var q= 0; q< selected.length; q++){
+        allLength += selected[q].length;
+    }
+    for(var i=0; i< allLength; i++){
+            answerString.push(selected[i]);
+         var randomStr = selected[i].split('').sort(randomsort);
+            str = randomStr.join("");
+            for(var k = 0; k < str.length; k++){
+    var color = '#'+Math.random().toString(16).substr(-6);
+    var colorR = '#'+Math.random().toString(16).substr(-6);
+    document.getElementById("letterList").innerHTML += "<text class='let' onclick='letterPlace(this.id, this);' id='"+i+""+k+"' style='color: color"+k+"'>"+str[k]+"</text>";
+    document.getElementById("answerPosition").innerHTML += "<text class='ans' id='ans"+i+k+"' onclick='fix();'>&nbsp;</text>"; 
+    var element = document.getElementById(i+""+k);
+    var elementT = document.getElementById("ans"+i+""+k);
+ element.style.background = color;
+ elementT.style.background = colorR;
+ positions.push("ans"+i+""+k);
+ letPositions.push(i+""+k);
+ randLetters.push(str[k]); 
+   }
+   document.getElementById("letterList").innerHTML += "</br>";
+   document.getElementById("answerPosition").innerHTML += "</br>";
+    }
+});
+function letterPlace(sender_id, id){
+    answerLetters.push(document.getElementById(sender_id).innerHTML);
+    document.getElementById(sender_id).style.display = "none";
+    for(var i=0; i < answerLetters.length; i++){
+                document.getElementById(positions[i]).innerHTML = answerLetters[i];
+    }
+        if(answerLetters.length == positions.length && answerLetters.join('') == answerString.join('')){
+             for(var k=0; k <  positions.length; k++){
+        document.getElementById(positions[k]).innerHTML = "&nbsp"; 
+        document.getElementById(positions[k]).style.display = "none";
+    }
+            getnewword();
+            
+        }
+        else if(answerLetters.length == positions.length && answerLetters.join('') != answerString.join('')){
+            answerLetters = [];
+        for(var k=0; k <  positions.length; k++){
+        document.getElementById(positions[k]).innerHTML = "&nbsp"; 
+        document.getElementsByClassName("let")[k].style.display = "inline-block";
+    }
+        }
+}
+function sharePhoto() {
+     var imageLink;
+            console.log('Calling from CapturePhoto');
+            navigator.screenshot.save(function(error,res){
+            if(error){
+            console.error(error);
+            }else{
+            console.log('ok',res.filePath); //should be path/to/myScreenshot.jpg
+            //For android
+            imageLink = res.filePath;
+           window.plugins.socialsharing.share(null, null,'file://'+imageLink, null);
+
+           //For iOS
+           //window.plugins.socialsharing.share(null,   null,imageLink, null)
+     }
+     },'jpg',50,'myScreenShot');
+    }
+        function fix(sender_id, id){
+        answerLetters = [];
+        for(var k=0; k <  positions.length; k++){
+        document.getElementById(positions[k]).innerHTML = "&nbsp"; 
+        document.getElementsByClassName("let")[k].style.display = "inline-block";
+    }
+    }
+    function bonus(){
+        var bonusPosition = answerLetters.length; 
+        var answerLetter = (answerString).join("");
+        document.getElementById(positions[bonusPosition]).innerHTML = answerLetter[bonusPosition];
+        answerLetters.push(answerLetter[bonusPosition]);
+        var ansLet = answerLetters[bonusPosition];
+        var pos = randLetters.indexOf(ansLet); // 0  
+         document.getElementById(letPositions[pos]).style.display = "none";
+         randLetters[pos] = ""; 
+if (answerLetter.indexOf(pos) === -1) {
+  // element doesn't exist in array
+}
+           
+
+        if(answerLetters.length == positions.length && answerLetters.join('') == answerString.join('')){
+             for(var k=0; k <  positions.length; k++){
+        document.getElementById(positions[k]).innerHTML = "&nbsp"; 
+        document.getElementById(positions[k]).style.display = "none";
+    }
+            getnewword();
+            
+        }
+        else if(answerLetters.length == positions.length && answerLetters.join('') != answerString.join('')){
+            answerLetters = [];
+        for(var k=0; k <  positions.length; k++){
+        document.getElementById(positions[k]).innerHTML = "&nbsp";  
+        document.getElementsByClassName("let")[k].style.display = "inline-block";
+    }
+        }
+    }
+</script>
+<div id="answerPosition" style="position: absolute; top: 10%; left: 1%; width: 90%;">
+
+</div>
+<div id="wordPosition">
+    
+</div>
+ 
+<div class="letterList" id="letterList" style="position: absolute; bottom: 50px; left: 1%; width: 90%;">
+    
+</div>
+<div id="level" ></div> 
+<img class="share" src="OTHERS_RED.png" onclick="sharePhoto();">
+<div id="bonus"  onclick="AdMob.showRewardVideoAd();" >Бонус</div>
+</body>
+</html>
